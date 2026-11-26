@@ -11,12 +11,11 @@
     "url": "https://github.com/aElDi"
   },
   "repository": "https://github.com/aElDi/orca-agent-advisor",
-  "homepage": "https://github.com/aElDi/orca-agent-advisor#readme",
   "license": "MIT",
   "icon": "assets/icon.png",
   "cover": {
     "path": "assets/cover.jpg",
-    "alt": "Agent Advisor minimalist dark editorial poster with two overlapping circles representing the Executor and Advisor models intersecting at advisor()"
+    "alt": "Agent Advisor minimalist dark artwork featuring two overlapping metallic rings intersecting in a warm amber lens"
   },
   "engines": {
     "orca": ">=1.4.274"

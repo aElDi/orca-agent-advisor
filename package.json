@@ -4,8 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "license": "MIT",
-  "description": "Two-tier second-opinion advisor for Orca coding agents — invisible headless routing (Claude Code /advisor style), live model & thinking effort selection, persistent workspace threads, and zero-config MCP auto-setup.",
-  "homepage": "https://github.com/aElDi/orca-agent-advisor#readme",
+  "description": "Two-tier second-opinion advisor for Orca coding agents — inspired by Claude Code's /advisor, with invisible headless routing, live model and effort selection, and automatic MCP setup.",
   "repository": {
     "type": "git",
     "url": "https://github.com/aElDi/orca-agent-advisor.git"
