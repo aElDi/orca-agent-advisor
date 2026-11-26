@@ -1,0 +1,306 @@
+{
+  "manifestVersion": 2,
+  "execution": "trusted-worker",
+  "pluginApi": 1,
+  "id": "agent-advisor",
+  "name": "Agent Advisor",
+  "version": "0.1.0",
+  "description": "Two-tier second-opinion advisor for Orca agents with invisible headless routing (Claude Code /advisor style), live model & effort selection, persistent workspace threads, and automatic MCP setup.",
+  "author": {
+    "name": "aElDi",
+    "url": "https://github.com/aElDi"
+  },
+  "repository": "https://github.com/aElDi/orca-agent-advisor",
+  "homepage": "https://github.com/aElDi/orca-agent-advisor#readme",
+  "license": "MIT",
+  "icon": "assets/icon.png",
+  "cover": {
+    "path": "assets/cover.jpg",
+    "alt": "Agent Advisor minimalist dark editorial poster with two overlapping circles representing the Executor and Advisor models intersecting at advisor()"
+  },
+  "engines": {
+    "orca": ">=1.4.274"
+  },
+  "main": "src/worker.ts",
+  "capabilities": [
+    { "kind": "workspace:read" },
+    { "kind": "agent:read" },
+    { "kind": "terminal:read" },
+    { "kind": "terminal:send" },
+    { "kind": "storage:own" },
+    { "kind": "secrets:own" },
+    { "kind": "settings:own" },
+    { "kind": "notifications:show" }
+  ],
+  "contributes": {
+    "panels": [
+      {
+        "id": "advisor-panel",
+        "title": "Advisor",
+        "icon": {
+          "path": "M15.5 14.5a6 6 0 1 1-12 0 6 6 0 0 1 12 0M20.5 9.5a6 6 0 1 1-12 0 6 6 0 0 1 12 0",
+          "viewBox": "0 0 24 24",
+          "mode": "stroke"
+        },
+        "entry": "src/panel.tsx",
+        "ui": "components"
+      }
+    ],
+    "statusBarItems": [
+      {
+        "id": "advisor-status",
+        "text": "Advisor",
+        "icon": "layers",
+        "tone": "neutral",
+        "tooltip": "Open Agent Advisor panel (Mod+Shift+A)",
+        "command": "advisor.open"
+      }
+    ],
+    "commands": [
+      {
+        "id": "advisor.open",
+        "title": "Advisor: Open Panel",
+        "when": "global"
+      },
+      {
+        "id": "advisor.consult",
+        "title": "Advisor: Consult on Current Workspace",
+        "when": "workspace"
+      },
+      {
+        "id": "advisor.reviewDiff",
+        "title": "Advisor: Review Current Git Diff",
+        "when": "workspace"
+      },
+      {
+        "id": "advisor.newThread",
+        "title": "Advisor: Start New Thread",
+        "when": "workspace"
+      },
+      {
+        "id": "advisor.resetBudget",
+        "title": "Advisor: Reset Turn Call Budget",
+        "when": "workspace"
+      },
+      {
+        "id": "advisor.toggleLoopDetector",
+        "title": "Advisor: Toggle Loop Detection",
+        "when": "global"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "advisor.open",
+        "key": "Mod+Shift+A",
+        "when": "global"
+      }
+    ],
+    "events": [
+      { "on": "workspace.changed" },
+      { "on": "workspace.removed" },
+      { "on": "agent.status.changed" }
+    ],
+    "hooks": [
+      { "event": "agent.launch.before" },
+      { "event": "agent.prompt.before" },
+      { "event": "agent.tool.after" }
+    ],
+    "settings": [
+      {
+        "key": "enabled",
+        "title": "Включить советника · Enable Advisor",
+        "description": "Главный переключатель автономных MCP-консультаций, детектора циклов и проверок diff. / Master switch for autonomous consultations and guardrails.",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "key": "advisorLevel",
+        "title": "Уровень советчика · Advisor level",
+        "description": "Частота вмешательства: Редко (в тупиках), Средне (по умолчанию), Часто (активно + авто-ревью diff). / How often Advisor intervenes.",
+        "type": "string",
+        "default": "balanced",
+        "enum": ["rare", "balanced", "frequent"],
+        "enumLabels": ["Редко · Rare", "Средне · Balanced", "Часто · Frequent"]
+      },
+      {
+        "key": "autoConnectAgents",
+        "title": "Автоподключение MCP и /advisor · Auto-connect agents & skill",
+        "description": "Автоматически регистрирует MCP-инструмент advisor во все установленные агенты (Claude, Codex, OpenCode, Grok, Gemini, Antigravity, Kilo, Cline) и ставит скилл /advisor при запуске. / Auto-registers MCP and /advisor skill on startup.",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "key": "backend",
+        "title": "Режим запуска · Execution mode",
+        "description": "Запуск через встроенных агентов Orca (рекомендуется), напрямую через CLI или по API. / Run through native Orca agents, direct headless CLI, or API.",
+        "type": "string",
+        "default": "orca-agent",
+        "enum": ["orca-agent", "codex-cli", "claude-cli", "openrouter", "anthropic", "openai"],
+        "enumLabels": [
+          "Агент Orca · Orca Agent (native)",
+          "Codex CLI (direct headless)",
+          "Claude CLI (direct headless)",
+          "OpenRouter API",
+          "Anthropic API",
+          "OpenAI / Compatible API"
+        ]
+      },
+      {
+        "key": "orcaAgent",
+        "title": "Агент-советник в Orca · Orca advisor agent",
+        "description": "Какой агент Orca используется в роли советника. / Which Orca-managed agent acts as the advisor.",
+        "type": "string",
+        "default": "codex",
+        "enum": ["codex", "claude", "opencode", "opencode2", "gemini", "antigravity", "grok", "kilo", "cline"],
+        "enumLabels": [
+          "Codex",
+          "Claude",
+          "OpenCode",
+          "OpenCode 2",
+          "Gemini",
+          "Antigravity",
+          "Grok",
+          "Kilocode",
+          "Cline"
+        ]
+      },
+      {
+        "key": "modelPreset",
+        "title": "Быстрый выбор модели · Model preset",
+        "description": "Актуальный список всех доступных моделей подтягивается автоматически в панели Advisor. / For the full live list of models, pick directly in the Advisor panel.",
+        "type": "string",
+        "default": "default",
+        "enum": ["default", "custom"],
+        "enumLabels": [
+          "По умолчанию из агента · Agent default",
+          "Задано вручную / из панели · Selected model ID"
+        ]
+      },
+      {
+        "key": "model",
+        "title": "ID модели · Model ID",
+        "description": "Точный ID модели (обновляется автоматически при выборе в панели Advisor). / Exact model ID override (synced with the Advisor panel).",
+        "type": "string",
+        "default": "",
+        "placeholder": "Пусто — модель агента по умолчанию / Empty for agent default"
+      },
+      {
+        "key": "reasoningEffort",
+        "title": "Глубина рассуждений · Reasoning effort",
+        "description": "Уровень рассуждений для агентов Orca, Claude и Codex. / Effort level for Orca agents, Claude, and Codex.",
+        "type": "string",
+        "default": "high",
+        "enum": ["default", "low", "medium", "high", "xhigh", "max"],
+        "enumLabels": [
+          "По умолчанию · Default",
+          "Низкий · Low",
+          "Средний · Medium",
+          "Высокий · High",
+          "Очень высокий · Extra High (xhigh)",
+          "Максимум · Max (Claude)"
+        ]
+      },
+      {
+        "key": "customBaseUrl",
+        "title": "Свой Base URL (OpenAI API) · Custom OpenAI base URL",
+        "description": "Опциональный адрес совместимого API (например http://localhost:11434/v1). / Optional OpenAI-compatible endpoint URL.",
+        "type": "string",
+        "default": "",
+        "placeholder": "https://api.openai.com/v1"
+      },
+      {
+        "key": "maxUsesPerTurn",
+        "title": "Лимит вызовов за ход · Max MCP calls per turn",
+        "description": "Мягкий лимит автономных обращений агента к советнику за один ход (0 = без лимита). / Soft cap on agent-initiated advisor calls per turn (0 = unlimited).",
+        "type": "integer",
+        "default": 4,
+        "minimum": 0,
+        "maximum": 20
+      },
+      {
+        "key": "loopDetectionEnabled",
+        "title": "Детектор зацикливания · Loop detection",
+        "description": "Отслеживает повторяющиеся неудачные команды/правки и предлагает помощь советника. / Detects repeated failing tool calls and alerts you.",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "key": "loopThreshold",
+        "title": "Порог зацикливания · Loop threshold",
+        "description": "Сколько одинаковых ошибок подряд запускают предупреждение. / Consecutive similar failures before warning.",
+        "type": "integer",
+        "default": 3,
+        "minimum": 2,
+        "maximum": 10
+      },
+      {
+        "key": "postFinishReviewMode",
+        "title": "Проверка крупного diff · Post-finish diff check",
+        "description": "Что делать, если агент завершил крупные правки без консультации с советником. / Action when an agent finishes a large unreviewed edit.",
+        "type": "string",
+        "default": "suggest",
+        "enum": ["suggest", "auto", "off"],
+        "enumLabels": [
+          "Предлагать в панели · Suggest",
+          "Запускать автоматически · Auto",
+          "Выключено · Off"
+        ]
+      },
+      {
+        "key": "autoInjectReviewFixes",
+        "title": "Авто-отправка правок в терминал · Auto-send review fixes",
+        "description": "Работает в режиме «Авто»: отправляет найденные замечания прямо в терминал агента. / Sends review findings to the terminal when diff check is 'auto'.",
+        "type": "boolean",
+        "default": false
+      },
+      {
+        "key": "minDiffLinesForReview",
+        "title": "Порог строк для ревью · Min diff lines for review",
+        "description": "Минимальное число изменённых строк для запуска проверки diff. / Minimum changed lines before suggesting a review.",
+        "type": "integer",
+        "default": 20,
+        "minimum": 1,
+        "maximum": 1000
+      },
+      {
+        "key": "injectPromptGuidance",
+        "title": "Подсказка об advisor в задачах · Prompt guidance",
+        "description": "Добавляет короткое напоминание об инструменте advisor в запускаемые задачи. / Appends a brief advisor hint to dispatched prompts.",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "key": "maxDiffChars",
+        "title": "Макс. размер diff (символы) · Max git diff chars",
+        "description": "Максимальный объём git diff, передаваемый советнику до обрезки. / Maximum diff size sent to the advisor.",
+        "type": "integer",
+        "default": 24000,
+        "minimum": 4000,
+        "maximum": 120000
+      },
+      {
+        "key": "redactSecrets",
+        "title": "Маскировать секреты · Redact secrets",
+        "description": "Скрывает API-ключи и токены в diff и логах перед отправкой советнику. / Masks API keys and bearer tokens before sending.",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "key": "notifyOnAlerts",
+        "title": "Уведомления · Desktop notifications",
+        "description": "Показывать уведомления о зацикливании и готовых ревью. / Show notifications for loop warnings and reviews.",
+        "type": "boolean",
+        "default": true
+      },
+      {
+        "key": "customSystemPrompt",
+        "title": "Доп. инструкции советнику · Extra advisor instructions",
+        "description": "Дополнительные правила, добавляемые к системному промпту советника. / Extra instructions appended to the advisor system prompt.",
+        "type": "string",
+        "default": "",
+        "multiline": true,
+        "maxLength": 4000
+      }
+    ]
+  }
+}

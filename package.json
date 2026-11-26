@@ -1,0 +1,41 @@
+{
+  "name": "orca-agent-advisor",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "description": "Two-tier second-opinion advisor for Orca coding agents — invisible headless routing (Claude Code /advisor style), live model & thinking effort selection, persistent workspace threads, and zero-config MCP auto-setup.",
+  "homepage": "https://github.com/aElDi/orca-agent-advisor#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/aElDi/orca-agent-advisor.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aElDi/orca-agent-advisor/issues"
+  },
+  "keywords": [
+    "orca",
+    "orca-plugin",
+    "advisor",
+    "mcp",
+    "claude-code",
+    "codex",
+    "grok",
+    "opencode",
+    "ai-agents"
+  ],
+  "scripts": {
+    "types": "orca plugin types .",
+    "typecheck": "tsc -p . --noEmit",
+    "check:mcp": "node --check src/mcp-server.mjs",
+    "validate": "orca plugin validate . --json",
+    "test": "orca plugin test . --json",
+    "check": "orca plugin check . --json",
+    "inspect": "orca plugin inspect . --json",
+    "dev": "orca plugin dev watch . --check --json"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.11",
+    "typescript": "^7.0.2"
+  }
+}

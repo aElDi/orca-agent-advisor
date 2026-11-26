@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Check MCP server syntax
+        run: node --check src/mcp-server.mjs
+      - name: Validate manifest and asset constraints
+        run: |
+          node -e '
+            const fs = require("node:fs");
+            const m = JSON.parse(fs.readFileSync("orca-plugin.json", "utf8"));
+            if (m.manifestVersion !== 2) throw new Error("manifestVersion must be 2");
+            if (!m.id || !m.version || !m.main) throw new Error("missing core manifest fields");
+            for (const p of [m.icon, m.cover.path, "assets/mark.png", m.main, "src/panel.tsx", "src/mcp-server.mjs"]) {
+              if (!fs.existsSync(p)) throw new Error("missing file: " + p);
+            }
+            console.log("Manifest & assets OK:", m.id, m.version);
+          '
